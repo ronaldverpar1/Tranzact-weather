@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 
 const state = {
@@ -27,15 +27,20 @@ const state = {
 
 const ChartWeather = (props) => {
     const { data } = props;
+    const [filterData, setFilterData] = useState([]);
 
-    data.forEach(e => {
+    useEffect(() => {
+        setFilterData(data.splice(0, 10));
+    }, [data]);
+
+    filterData.forEach(e => {
         state.labels.push(e.day);
         state.datasets[0].data.push(e.temp);
         state.datasets[1].data.push(e.humidity);
     });
 
     return ( 
-        <div style={{ width: '800px', marginTop: '80px' }}>
+        <div style={{ width: '800px', marginTop: 20 }}>
             <Line
                 data={state}
                 options={{

@@ -1,4 +1,4 @@
-import { Grid, Typography } from '@material-ui/core';
+import { Box, Grid, Typography } from '@material-ui/core';
 import React from 'react';
 // icons
 import Rain from '@material-ui/icons/GrainRounded';
@@ -11,8 +11,15 @@ const CardWeather = (props) => {
     const { item } = props;
 
     return ( 
-        <Grid item style={{ boxShadow: 'rgba(17, 12, 46, 0.15) 0px 48px 100px 0px' }}>
-            <Grid container direction="column" justifyContent="center" alignItems="center">
+        <Grid item xs={2} style={{ padding: 0 }}>
+            <Box 
+                component="div"
+                display="flex" 
+                flexDirection="column" 
+                justifyContent="center" 
+                alignItems="center"
+                style={{ width: 150, height: 150, margin: 8, borderRadius: 10, boxShadow: 'rgba(17, 17, 26, 0.1) 0px 0px 16px' }}
+            >
                 <Typography variant="subtitle1">{item.day}</Typography>
                 {
                     item.status == 'Clear' ? <Sun style={{ color: '#ffc600' }} /> 
@@ -23,10 +30,14 @@ const CardWeather = (props) => {
                     ))
                 }
                 <Grid container direction="row" justifyContent="center" alignItems="center" spacing={2}>
-                    <Grid item>{item.temp_min}</Grid>
-                    <Grid item>{item.temp_max}</Grid>
+                    <Grid item>
+                        <Typography variant="subtitle2" style={{ color: '#4f5356' }}>{item.temp_min}°</Typography>
+                    </Grid>
+                    <Grid item>
+                        <Typography variant="subtitle2" style={{ color: '#bababa' }}>{item.temp_max}°</Typography>
+                    </Grid>
                 </Grid>
-            </Grid>
+            </Box>
         </Grid>
      );
 }

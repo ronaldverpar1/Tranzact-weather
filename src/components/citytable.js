@@ -1,13 +1,13 @@
 import React from 'react'
-import { Table, TableContainer, TableBody, TableHead, TableRow, TableCell, TablePagination, Grid } from '@material-ui/core';
+import { Table, TableContainer, TableBody, TableHead, TableRow, TableCell, TablePagination, Paper, IconButton, Button } from '@material-ui/core';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import NextLink from 'next/link';
+import View from '@material-ui/icons/VisibilityRounded';
 
 const StyledTableCell = withStyles((theme) => ({
     head: {
-      backgroundColor: theme.palette.common.black,
-      boxShadow: 'rgba(99, 99, 99, 0.2) 0px 2px 8px 0px'
+      height: 40,
     },
     body: {
       fontSize: 14,
@@ -60,9 +60,11 @@ function EnhancedTableHead(props) {
 
     return (
         <TableHead>
-            <TableRow>
+            <TableRow style={{ boxShadow: 'rgba(0, 0, 0, 0.09) 0px 3px 12px' }}>
+            <StyledTableCell padding="checkbox">
+            </StyledTableCell>
                 {headCells.map((headCell) => (
-                    <TableCell
+                    <StyledTableCell
                     key={headCell.id}
                     align="left"
                     padding={headCell.disablePadding ? 'none' : 'normal'}
@@ -80,7 +82,7 @@ function EnhancedTableHead(props) {
                                 </span>
                             ) : null}
                         </TableSortLabel>
-                    </TableCell>
+                    </StyledTableCell>
                 ))}
             </TableRow>
         </TableHead>
@@ -88,6 +90,12 @@ function EnhancedTableHead(props) {
 }
 
 const useStyles = makeStyles((theme) => ({
+    paper: {
+        width: '100%',
+        padding: 10,
+        borderRadius: 10,
+        boxShadow: 'rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px'
+    },
     table: {
         width: '100%',
         fontFamily: 'Poppins'
@@ -112,7 +120,7 @@ const CityTable = (props) => {
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('calories');
     const [page, setPage] = React.useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -130,64 +138,64 @@ const CityTable = (props) => {
     };
 
     return ( 
-        <Grid 
-            container  
-            spacing={0}
-            direction="column"
-            alignItems="center"
-        >
-            <Grid item style={{ width: '80%' }}>
-                <TableContainer>
-                    <Table
-                    className={classes.table}
-                    aria-labelledby="tableTitle"
-                    size="medium"
-                    aria-label="enhanced table"
-                    >
-                        <EnhancedTableHead
-                            classes={classes}
-                            order={order}
-                            orderBy={orderBy}
-                            onRequestSort={handleRequestSort}
-                        />
-                        <TableBody>
-                            {
-                                stableSort(rows, getComparator(order, orderBy))
-                                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                .map((row, index) => {
-                                    return (
-                                        <TableRow
-                                        hover
-                                        key={row.id}
-                                        >
-                                            <TableCell component="th" id={row.id} scope="row" padding="none">
-                                                {row.id}
+        <Paper className={classes.paper}>
+            <TableContainer>
+                <Table
+                className={classes.table}
+                aria-labelledby="tableTitle"
+                size="medium"
+                aria-label="enhanced table"
+                >
+                    <EnhancedTableHead
+                        classes={classes}
+                        order={order}
+                        orderBy={orderBy}
+                        onRequestSort={handleRequestSort}
+                    />
+                    <TableBody>
+                        {
+                            stableSort(rows, getComparator(order, orderBy))
+                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                            .map((row, index) => {
+                                return (
+                                    <TableRow
+                                    hover
+                                    key={row.id}
+                                    >
+                                        <NextLink href="/city/[id]" as={`/city/${row.id}`}>
+                                            <TableCell>
+                                                <IconButton aria-label="view">
+                                                    <View style={{ color: '#a0a3b3', width: 20 }} />
+                                                </IconButton>
                                             </TableCell>
-                                            <NextLink href="/city/[id]" as={`/city/${row.id}`}>
-                                                <StyledTableCell align="left">
-                                                    {row.name}
-                                                </StyledTableCell>
-                                            </NextLink>
-                                            <TableCell align="left">{row.country}</TableCell>
-                                            <TableCell align="left">{row.coord.lon}  {row.coord.lat}</TableCell>
-                                        </TableRow>
-                                    );
-                                })
-                            }
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                <TablePagination
-                    rowsPerPageOptions={[5, 10, 25]}
-                    component="div"
-                    count={rows.length}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                />
-            </Grid>
-        </Grid>
+                                        </NextLink>
+                                        <TableCell component="th" id={row.id} scope="row" padding="none">
+                                            {row.id}
+                                        </TableCell>
+                                        <NextLink href="/city/[id]" as={`/city/${row.id}`}>
+                                            <StyledTableCell align="left">
+                                                {row.name}
+                                            </StyledTableCell>
+                                        </NextLink>
+                                        <TableCell align="left">{row.country}</TableCell>
+                                        <TableCell align="left">{row.coord.lon}  {row.coord.lat}</TableCell>
+                                    </TableRow>
+                                );
+                            })
+                        }
+                    </TableBody>
+                </Table>
+            </TableContainer>
+            <TablePagination
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={rows.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+        </Paper>
 
     );
 }

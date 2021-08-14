@@ -7,12 +7,6 @@ import CardWeather from '../../src/components/cardweather';
 import NextLink from 'next/link';
 import RouterLink from 'next/router';
 import moment from 'moment';
-// icons
-import GrainRoundedIcon from '@material-ui/icons/GrainRounded';
-import WbSunnyRoundedIcon from '@material-ui/icons/WbSunnyRounded';
-import CloudRoundedIcon from '@material-ui/icons/CloudRounded';
-import FilterDramaRoundedIcon from '@material-ui/icons/FilterDramaRounded';
-import AcUnitRoundedIcon from '@material-ui/icons/AcUnitRounded';
 
 import ArrowBackRoundedIcon from '@material-ui/icons/ArrowBackRounded';
 import ChartWeather from '../../src/components/chartWeather';
@@ -22,64 +16,6 @@ const City = (props) => {
     const [listDayWeather, setListDayWeather] = useState([]);
     const [dataGraph, setDataGraph] = useState([]);
     const [error, setError] = useState(false);
-
-    const weatherStatic = [
-        {
-            day: 'Wed',
-            status: 'cloudy',
-            minTemp: '68º',
-            maxTemp: '74º',
-            icon: <FilterDramaRoundedIcon />
-        },
-        {
-            day: 'Thu',
-            status: 'cloud',
-            minTemp: '68º',
-            maxTemp: '74º',
-            icon: <CloudRoundedIcon />
-        },
-        {
-            day: 'Fri',
-            status: 'sun',
-            minTemp: '68º',
-            maxTemp: '74º',
-            icon: <WbSunnyRoundedIcon />
-        },
-        {
-            day: 'Sat',
-            status: 'rainy',
-            minTemp: '68º',
-            maxTemp: '74º',
-            icon: <GrainRoundedIcon />
-        },
-        {
-            day: 'Sun',
-            status: 'snowy',
-            minTemp: '68º',
-            maxTemp: '74º',
-            icon: <AcUnitRoundedIcon />
-        }
-    ];
-    // let weatherData = [];
-    // weatherData = weatherStatic.forEach(item => {
-    //     switch (item.status) {
-    //         case 'cloudy':
-    //             item.icon = <Cloudy />;
-    //             break;
-    //         case 'cloud':
-    //             item.icon = <Cloud />;
-    //             break;
-    //         case 'sun':
-    //             item.icon = <Sun />;
-    //             break;
-    //         case 'rainy':
-    //             item.icon = <Rainy />;
-    //             break;
-    //         default:
-    //             item.icon = <Sun />;
-    //             break;
-    //     }
-    // })
 
     // routing to get the actual ID
     const router = useRouter();
@@ -105,7 +41,6 @@ const City = (props) => {
                         item,
                         ],
                     }),{});
-                    console.log(graphicData);
 
                     const listWeek = [];
                     const listGraph = [];
@@ -116,8 +51,8 @@ const City = (props) => {
                             let data = {
                                 day: moment(key).format('dddd'),
                                 status: element[0].weather[0].main,
-                                temp_max: element[0].main.temp_max,
-                                temp_min: element[0].main.temp_min,
+                                temp_max: convertKelvinToCelcius(element[0].main.temp_max),
+                                temp_min: convertKelvinToCelcius(element[0].main.temp_min),
                             }
                             listWeek.push(data);
 
@@ -125,24 +60,32 @@ const City = (props) => {
                             element.forEach(e => {
                                 let dataGraph = {
                                     day: moment(e.dt_txt).calendar(),
-                                    temp: e.main.temp,
+                                    temp: convertKelvinToCelcius(e.main.temp),
                                     humidity: e.main.humidity
                                 };
+
                                 listGraph.push(dataGraph);
                             });
+
                         }
                     }
+
                     setListDayWeather(listWeek);
+                    // Just show 10 data in the chart
                     setDataGraph(listGraph);
                 });
             } else {
                 setError(true);
             }
         }
+
+        function convertKelvinToCelcius (temp) {
+            return (temp - 273.15).toFixed(1);
+        }
     }, [id]);
 
     // show loading message
-    if (Object.keys(city).length === 0 ) return 'loading...';
+    if (Object.keys(city).length === 0  || listDayWeather.length === 0 || dataGraph.length === 0 ) return 'loading...';
 
     return ( 
         <Container>
@@ -159,8 +102,8 @@ const City = (props) => {
                 alignItems="center"
             >
                 <Grid item style={{ margin: '20px 0' }}>
-                    <Typography variant="h3">{city.name}</Typography>
-                    <Typography variant="h5" style={{ textAlign: 'center' }}>{city.country}</Typography>
+                    <Typography variant="h3" style={{ color: '#444e65', fontWeight: 600 }}>{city.name}</Typography>
+                    <Typography variant="h6" style={{ textAlign: 'center', color: '#8ea8bf', fontWeight: 500 }}>{city.country}</Typography>
                 </Grid>
                 <Grid item>
                     <Grid 
@@ -169,7 +112,7 @@ const City = (props) => {
                     justifyContent="center"
                     alignItems="center"
                     spacing={8}
-                    style={{ marginTop: '20px' }}
+                    style={{ margin: 0, width: '100%' }}
                     >
                         {
                             listDayWeather.map((item, index) => (
@@ -177,6 +120,9 @@ const City = (props) => {
                             ))
                         }
                     </Grid>
+                </Grid>
+                <Grid item style={{ marginTop: 40 }}>
+                    <Typography variant="h5" style={{ color: '#444e65', fontWeight: 600 }}>Temperature and Humidity Graph</Typography>
                 </Grid>
                 <Grid item>
                     <ChartWeather data={dataGraph} />
